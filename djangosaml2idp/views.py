@@ -23,7 +23,6 @@ from saml2.s_utils import UnknownPrincipal, UnsupportedBinding
 from saml2.server import Server
 from six import text_type
 
-from .identity import create_identity
 from .processors import BaseProcessor
 
 logger = logging.getLogger(__name__)
