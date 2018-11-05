@@ -18,3 +18,6 @@ class BaseProcessor(object):
 
     def get_username(self, user):
         return user.username
+
+    def get_name_policy_format(self, name_format):
+        return name_format

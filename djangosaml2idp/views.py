@@ -127,11 +127,16 @@ def login_process(request):
     if not username:
         username = request.user.username
 
+    # Get name policy format from processor
+    name_policy_format = processor.get_name_policy_format(resp_args['name_id_policy'].format)
+    if not name_policy_format:
+        name_policy_format = resp_args['name_id_policy'].format
+
     # Construct SamlResponse message
     try:
         authn_resp = IDP.create_authn_response(
             identity=identity, userid=username,
-            name_id=NameID(format=resp_args['name_id_policy'].format, sp_name_qualifier=destination, text=username),
+            name_id=NameID(format=name_policy_format, sp_name_qualifier=destination, text=username),
             authn=AUTHN_BROKER.get_authn_by_accr(req_authn_context),
             sign_response=IDP.config.getattr("sign_response", "idp") or False,
             sign_assertion=IDP.config.getattr("sign_assertion", "idp") or False,
