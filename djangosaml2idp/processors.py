@@ -15,3 +15,6 @@ class BaseProcessor(object):
             for user_attr, out_attr in sp_mapping.items()
             if hasattr(user, user_attr)
         }
+
+    def get_username(self, user):
+        return user.username

@@ -122,11 +122,16 @@ def login_process(request):
     AUTHN_BROKER = AuthnBroker()
     AUTHN_BROKER.add(authn_context_class_ref(req_authn_context), "")
 
+    # Get username according to processor, use request.user.username if the processor doesn't give us one
+    username = processor.get_username(request.user)
+    if not username:
+        username = request.user.username
+
     # Construct SamlResponse message
     try:
         authn_resp = IDP.create_authn_response(
-            identity=identity, userid=request.user.username,
-            name_id=NameID(format=resp_args['name_id_policy'].format, sp_name_qualifier=destination, text=request.user.username),
+            identity=identity, userid=username,
+            name_id=NameID(format=resp_args['name_id_policy'].format, sp_name_qualifier=destination, text=username),
             authn=AUTHN_BROKER.get_authn_by_accr(req_authn_context),
             sign_response=IDP.config.getattr("sign_response", "idp") or False,
             sign_assertion=IDP.config.getattr("sign_assertion", "idp") or False,
