@@ -21,3 +21,6 @@ class BaseProcessor(object):
 
     def get_name_policy_format(self, name_format):
         return name_format
+
+    def get_name_qualifier(self, name_qualifier):
+        return name_qualifier

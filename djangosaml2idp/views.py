@@ -132,11 +132,16 @@ def login_process(request):
     if not name_policy_format:
         name_policy_format = resp_args['name_id_policy'].format
 
+    # Get name qualifier from processor
+    name_qualifier = processor.get_name_qualifier(destination)
+    if not name_qualifier:
+        name_qualifier = destination
+
     # Construct SamlResponse message
     try:
         authn_resp = IDP.create_authn_response(
             identity=identity, userid=username,
-            name_id=NameID(format=name_policy_format, sp_name_qualifier=destination, text=username),
+            name_id=NameID(format=name_policy_format, sp_name_qualifier=name_qualifier, text=username),
             authn=AUTHN_BROKER.get_authn_by_accr(req_authn_context),
             sign_response=IDP.config.getattr("sign_response", "idp") or False,
             sign_assertion=IDP.config.getattr("sign_assertion", "idp") or False,
