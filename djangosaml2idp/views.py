@@ -33,13 +33,18 @@ try:
 except AttributeError:
     raise ImproperlyConfigured("SAML_IDP_SPCONFIG not defined in settings.")
 
-
 @csrf_exempt
 def sso_entry(request):
     """ Entrypoint view for SSO. Gathers the parameters from the HTTP request, stores them in the session
         and redirects the requester to the login_process view.
     """
     passed_data = request.POST if request.method == 'POST' else request.GET
+
+    if request.method == 'POST':
+        request.session['BindingMethod'] = BINDING_HTTP_POST
+    else:
+        request.session['BindingMethod'] = BINDING_HTTP_REDIRECT
+
     try:
         request.session['SAMLRequest'] = passed_data['SAMLRequest']
     except (KeyError, MultiValueDictKeyError) as e:
@@ -65,7 +70,7 @@ def login_process(request):
     IDP = Server(config=conf)
     # Parse incoming request
     try:
-        req_info = IDP.parse_authn_request(request.session['SAMLRequest'], BINDING_HTTP_POST)
+        req_info = IDP.parse_authn_request(request.session['SAMLRequest'], request.session['BindingMethod'])
     except Exception as excp:
         return HttpResponseBadRequest(excp)
     # TODO this is taken from example, but no idea how this works or whats it does. Check SAML2 specification?
